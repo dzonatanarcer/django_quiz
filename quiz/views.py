@@ -200,6 +200,7 @@ class QuizTake(FormView):
         progress, c = Progress.objects.get_or_create(user=self.request.user)
         guess = form.cleaned_data['answers']
         is_correct = self.question.check_if_correct(guess)
+        # HERE FIX
 
         if is_correct is True:
             self.sitting.add_to_score(1)
