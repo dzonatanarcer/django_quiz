@@ -570,6 +570,11 @@ class Question(models.Model):
                                                "been answered."),
                                    verbose_name=_('Explanation'))
 
+    seconds_to_answer = models.IntegerField(verbose_name=_("Seconds to answer"),
+                                            default=0,
+                                            help_text=_("Seconds limit to answer"
+                                                        "0 - unlimited"))
+
     objects = InheritanceManager()
 
     class Meta:
