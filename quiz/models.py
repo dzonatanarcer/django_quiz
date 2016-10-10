@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 import re
 import json
 from datetime import datetime, timedelta
+from django.contrib.contenttypes.generic import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 from django.db import models
 from django.core.exceptions import ValidationError, ImproperlyConfigured
@@ -573,13 +575,13 @@ class Question(models.Model):
 
     seconds_to_answer = models.IntegerField(verbose_name=_("Seconds to answer"),
                                             default=0,
-                                            help_text=_("Seconds limit to answer"
+                                            help_text=_("Seconds limit to answer "
                                                         "0 - unlimited"))
 
-    question_take_time = models.DateTimeField(verbose_name=_("Question take time"),
-                                              blank=True, null=True)
-
     objects = InheritanceManager()
+
+    def get_content_type(self):
+        return ContentType.objects.get_for_model(self).id
 
     class Meta:
         verbose_name = _("Question")
@@ -589,5 +591,28 @@ class Question(models.Model):
     def __str__(self):
         return self.content
 
-    def check_in_time(self):
-        return (self.question_take_time + timedelta(seconds=self.seconds_to_answer)) > datetime.now()
+    def check_in_time(self, sit):
+        if self.seconds_to_answer > 0:
+            try:
+                take_object = QuestionTakes.objects.get(
+                    sit=sit,
+                    content_object=self)
+                return (take_object.question_take_time + timedelta(seconds=self.seconds_to_answer)) > datetime.now()
+            except QuestionTakes.DoesNotExist:
+                pass
+
+        return True
+
+
+@python_2_unicode_compatible
+class QuestionTakes(models.Model):
+    sit = models.ForeignKey(Sitting, verbose_name=_('Sitting'))
+    question_take_time = models.DateTimeField(verbose_name=_("Question take time"),
+                                              blank=True, null=True)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        verbose_name = _('question take')
+        verbose_name_plural = _('question takes')

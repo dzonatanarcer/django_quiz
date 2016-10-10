@@ -69,7 +69,7 @@ class MCQuestionAdmin(admin.ModelAdmin):
     list_display = ('content', 'category', )
     list_filter = ('category',)
     fields = ('content', 'category', 'sub_category',
-              'figure', 'quiz', 'explanation', 'answer_order')
+              'figure', 'quiz', 'explanation', 'answer_order', 'seconds_to_answer')
 
     search_fields = ('content', 'explanation')
     filter_horizontal = ('quiz',)
@@ -98,7 +98,7 @@ class TFQuestionAdmin(admin.ModelAdmin):
 class EssayQuestionAdmin(admin.ModelAdmin):
     list_display = ('content', 'category', )
     list_filter = ('category',)
-    fields = ('content', 'category', 'sub_category', 'quiz', 'explanation', )
+    fields = ('content', 'category', 'sub_category', 'quiz', 'explanation', 'seconds_to_answer')
     search_fields = ('content', 'explanation')
     filter_horizontal = ('quiz',)
 
