@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, TemplateView, FormView
 
 from .forms import QuestionForm, EssayForm
-from .models import Quiz, Category, Progress, Sitting, Question
+from .models import Quiz, Category, Progress, Sitting, Question, QuestionTakes
 from essay.models import Essay_Question
 
 
@@ -158,9 +158,8 @@ class QuizTake(FormView):
     def get_form(self, form_class):
         if self.logged_in_user:
             self.question = self.sitting.get_first_question()
-            self.question.question_take_time = datetime.now()
-            self.question.save()
             self.progress = self.sitting.progress()
+            QuestionTakes.take(self.sitting, self.question)
         else:
             self.question = self.anon_next_question()
             self.progress = self.anon_sitting_progress()
@@ -203,7 +202,7 @@ class QuizTake(FormView):
         progress, c = Progress.objects.get_or_create(user=self.request.user)
         guess = form.cleaned_data['answers']
         is_correct = self.question.check_if_correct(guess)
-        is_in_time = self.question.check_in_time()
+        is_in_time = self.question.check_in_time(self.sitting)
 
         if is_correct and is_in_time:
             self.sitting.add_to_score(1)

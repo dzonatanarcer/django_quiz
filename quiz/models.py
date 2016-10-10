@@ -596,7 +596,8 @@ class Question(models.Model):
             try:
                 take_object = QuestionTakes.objects.get(
                     sit=sit,
-                    content_object=self)
+                    object_id=self.id,
+                    content_type__pk=ContentType.objects.get_for_model(self).id)
                 return (take_object.question_take_time + timedelta(seconds=self.seconds_to_answer)) > datetime.now()
             except QuestionTakes.DoesNotExist:
                 pass
@@ -608,13 +609,24 @@ class Question(models.Model):
 class QuestionTakes(models.Model):
     sit = models.ForeignKey(Sitting, verbose_name=_('Sitting'))
     question_take_time = models.DateTimeField(verbose_name=_("Question take time"),
-                                              blank=True, null=True)
+                                              auto_now_add=True,
+                                              null=True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
-        return str(self.content_object) + str(self.question_take_time) 
+        return str(self.content_object) + str(self.question_take_time)
+
+    @staticmethod
+    def take(sit, question):
+        if QuestionTakes.objects.filter(
+            sit=sit,
+            object_id=question.id,
+            content_type__pk=ContentType.objects.get_for_model(question).id
+        ).count() == 0:
+            qt = QuestionTakes(sit=sit, content_object=question)
+            qt.save()
 
     class Meta:
         verbose_name = _('question take')
