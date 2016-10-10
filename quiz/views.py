@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
@@ -157,6 +158,8 @@ class QuizTake(FormView):
     def get_form(self, form_class):
         if self.logged_in_user:
             self.question = self.sitting.get_first_question()
+            self.question.question_take_time = datetime.now()
+            self.question.save()
             self.progress = self.sitting.progress()
         else:
             self.question = self.anon_next_question()
@@ -201,8 +204,9 @@ class QuizTake(FormView):
         guess = form.cleaned_data['answers']
         is_correct = self.question.check_if_correct(guess)
         # HERE FIX
+        is_in_time = self.question.check_in_time()
 
-        if is_correct is True:
+        if is_correct and is_in_time:
             self.sitting.add_to_score(1)
             progress.update_score(self.question, 1, 1)
         else:
@@ -212,6 +216,7 @@ class QuizTake(FormView):
         if self.quiz.answers_at_end is not True:
             self.previous = {'previous_answer': guess,
                              'previous_outcome': is_correct,
+                             'previous_in_time': is_in_time,
                              'previous_question': self.question,
                              'answers': self.question.get_answers(),
                              'question_type': {self.question

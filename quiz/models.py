@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import re
 import json
+from datetime import datetime, timedelta
 
 from django.db import models
 from django.core.exceptions import ValidationError, ImproperlyConfigured
@@ -587,3 +588,6 @@ class Question(models.Model):
 
     def __str__(self):
         return self.content
+
+    def check_in_time(self):
+        return (self.question_take_time + timedelta(seconds=self.seconds_to_answer)) > datetime.now()
