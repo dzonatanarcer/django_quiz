@@ -575,6 +575,9 @@ class Question(models.Model):
                                             help_text=_("Seconds limit to answer"
                                                         "0 - unlimited"))
 
+    question_take_time = models.DateTimeField(verbose_name=_("Question take time"),
+                                              blank=True, null=True)
+
     objects = InheritanceManager()
 
     class Meta:
