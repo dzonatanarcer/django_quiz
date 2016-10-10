@@ -618,15 +618,22 @@ class QuestionTakes(models.Model):
     def __str__(self):
         return str(self.content_object) + str(self.question_take_time)
 
+    def get_left_time(self, question):
+        left_time = (self.question_take_time + timedelta(seconds=question.seconds_to_answer)) - datetime.now()
+        return int(left_time.total_seconds()) if left_time.total_seconds() >= 0 else 0
+
     @staticmethod
     def take(sit, question):
-        if QuestionTakes.objects.filter(
+        test_take = QuestionTakes.objects.filter(
             sit=sit,
             object_id=question.id,
-            content_type__pk=ContentType.objects.get_for_model(question).id
-        ).count() == 0:
+            content_type__pk=ContentType.objects.get_for_model(question).id)
+        if test_take.count() == 0:
             qt = QuestionTakes(sit=sit, content_object=question)
             qt.save()
+            return qt
+        else:
+            return test_take[0]
 
     class Meta:
         verbose_name = _('question take')

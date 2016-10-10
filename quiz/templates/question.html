@@ -45,6 +45,27 @@
 </div>
 {% endif %}
 
+{% if question.seconds_to_answer and time_left >= 0 %}
+    <script type="text/javascript">
+    var seconds = {{ time_left }};
+    function timer()
+    {
+        seconds -= 1;
+        document.getElementById("time_left").innerHTML = seconds;
+        if (seconds > 0)
+        {
+            setTimeout(timer, 1000);
+        }
+    }
+    setTimeout(timer, 1000);
+    </script>
+
+    <span style="font-size: 20px">
+        time left:
+        <span id="time_left" style="color: #dd1919">{{ time_left }}</span>
+        seconds</span>
+{% endif %}
+
 {% if question.category %}
 <p>
   <small class="muted">{% trans "Question category" %}:</small>

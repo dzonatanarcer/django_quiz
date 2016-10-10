@@ -159,7 +159,7 @@ class QuizTake(FormView):
         if self.logged_in_user:
             self.question = self.sitting.get_first_question()
             self.progress = self.sitting.progress()
-            QuestionTakes.take(self.sitting, self.question)
+            self.take = QuestionTakes.take(self.sitting, self.question)
         else:
             self.question = self.anon_next_question()
             self.progress = self.anon_sitting_progress()
@@ -196,6 +196,8 @@ class QuizTake(FormView):
             context['previous'] = self.previous
         if hasattr(self, 'progress'):
             context['progress'] = self.progress
+        if hasattr(self, 'take'):
+            context['time_left'] = self.take.get_left_time(self.question)
         return context
 
     def form_valid_user(self, form):
