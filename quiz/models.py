@@ -613,6 +613,9 @@ class QuestionTakes(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    def __str__(self):
+        return str(self.content_object) + str(self.question_take_time) 
+
     class Meta:
         verbose_name = _('question take')
         verbose_name_plural = _('question takes')
