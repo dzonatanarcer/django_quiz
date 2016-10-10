@@ -203,7 +203,6 @@ class QuizTake(FormView):
         progress, c = Progress.objects.get_or_create(user=self.request.user)
         guess = form.cleaned_data['answers']
         is_correct = self.question.check_if_correct(guess)
-        # HERE FIX
         is_in_time = self.question.check_in_time()
 
         if is_correct and is_in_time:

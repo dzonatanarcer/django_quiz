@@ -20,7 +20,6 @@ from true_false.models import TF_Question
 from essay.models import Essay_Question
 
 
-# THE FLAG IS: "_norris_remus_newton_"
 class TestCategory(TestCase):
     def setUp(self):
         self.c1 = Category.objects.new_category(category='squishy   berries')
